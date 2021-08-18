@@ -1,6 +1,5 @@
 package com.andreibarroso.apidebezium.config;
 
-import com.andreibarroso.apidebezium.entity.Customer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,44 +8,44 @@ import org.springframework.context.annotation.Configuration;
 public class DebeziumConnectorConfig {
 
     /**
-     * Database details.
+     * Student Database details.
      */
-    @Value("${customer.datasource.host}")
-    private String customerDbHost;
+    @Value("${student.datasource.host}")
+    private String studentDBHost;
 
-    @Value("${customer.datasource.database}")
-    private String customerDbName;
+    @Value("${student.datasource.databasename}")
+    private String studentDBName;
 
-    @Value("${customer.datasource.port}")
-    private String customerDbPort;
+    @Value("${student.datasource.port}")
+    private String studentDBPort;
 
-    @Value("${customer.datasource.username}")
-    private String customerDbUsername;
+    @Value("${student.datasource.username}")
+    private String studentDBUserName;
 
-    @Value("${customer.datasource.password}")
-    private String customerDbPassword;
+    @Value("${student.datasource.password}")
+    private String studentDBPassword;
+
+    private String STUDENT_TABLE_NAME = "public.student";
 
     /**
-     * Customer Database Connector Configuration
+     * Student database connector.
+     *
+     * @return Configuration.
      */
-
-
     @Bean
-    public io.debezium.config.Configuration customerConnector() {
+    public io.debezium.config.Configuration studentConnector() {
         return io.debezium.config.Configuration.create()
-                .with("name", "customer-oracle-connector")
                 .with("connector.class", "io.debezium.connector.postgresql.PostgresConnector")
-                .with("offset.storage", "org.apache.kafka.connect.storage.FileOffsetBackingStore")
+                .with("offset.storage",  "org.apache.kafka.connect.storage.FileOffsetBackingStore")
                 .with("offset.storage.file.filename", "/tmp/offsets.dat")
-                .with("database.sslmode", "disable")
-                .with("offset.flush.interval.ms", "60000")
-                .with("database.hostname", customerDbHost)
-                .with("database.port", customerDbPort)
-                .with("database.user", customerDbUsername)
-                .with("database.password", customerDbPassword)
-                .with("database.dbname", customerDbName)
-                .with("database.include.list", customerDbName)
-                .with("database.server.name", "customer-oracle-db-server")
-                .build();
+                .with("offset.flush.interval.ms", 60000)
+                .with("name", "student-postgres-connector")
+                .with("database.server.name", studentDBHost+"-"+studentDBName)
+                .with("database.hostname", studentDBHost)
+                .with("database.port", studentDBPort)
+                .with("database.user", studentDBUserName)
+                .with("database.password", studentDBPassword)
+                .with("database.dbname", studentDBName)
+                .with("table.whitelist", STUDENT_TABLE_NAME).build();
     }
 }

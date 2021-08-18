@@ -1,6 +1,6 @@
 package com.andreibarroso.apidebezium.listener;
 
-import com.andreibarroso.apidebezium.service.CustomerService;
+import com.andreibarroso.apidebezium.service.StudentService;
 import io.debezium.config.Configuration;
 import io.debezium.embedded.Connect;
 import io.debezium.engine.DebeziumEngine;
@@ -12,27 +12,28 @@ import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
 import static io.debezium.data.Envelope.FieldName.*;
 import static io.debezium.data.Envelope.Operation;
 import static java.util.stream.Collectors.toMap;
 
 
-
 @Slf4j
 @Component
-public class DebeziumListener {
+public class CDCListener {
 
     private final Executor executor = Executors.newSingleThreadExecutor();
-    private final CustomerService customerService;
+    private final StudentService customerService;
     private final DebeziumEngine<RecordChangeEvent<SourceRecord>> debeziumEngine;
 
-    public DebeziumListener(Configuration customerConnectorConfiguration, CustomerService customerService) {
+    public CDCListener(Configuration customerConnectorConfiguration, StudentService customerService) {
 
         this.debeziumEngine = DebeziumEngine.create(ChangeEventFormat.of(Connect.class))
                 .using(customerConnectorConfiguration.asProperties())
@@ -62,7 +63,7 @@ public class DebeziumListener {
                         .map(fieldName -> Pair.of(fieldName, struct.get(fieldName)))
                         .collect(toMap(Pair::getKey, Pair::getValue));
 
-                this.customerService.replicateData(payload, operation);
+                this.customerService.maintainReadModel(payload, operation);
                 log.info("Updated Data: {} with Operation: {}", payload, operation.name());
             }
         }
@@ -81,4 +82,3 @@ public class DebeziumListener {
     }
 
 }
-

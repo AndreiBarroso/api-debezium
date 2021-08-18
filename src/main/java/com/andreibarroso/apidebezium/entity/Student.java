@@ -1,17 +1,18 @@
 package com.andreibarroso.apidebezium.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+@Data
 @Entity
-@Getter
-@Setter
-public class Customer {
+public  class Student {
     @Id
-    private Long id;
-    private String fullname;
+    private Integer id;
+
+    private String name;
+
+    private String address;
+
     private String email;
 }
